@@ -37,6 +37,8 @@ def DetectAES_ECB(ciphertext: bytes, keySize: int) -> bool:
     return False
 
 
+# The RFC is very clear, if the plaintext is the multiple of the block size
+# the padding should be an entire block.
 def AddPKCS7Padding(plaintext: bytes, blockSize: int) -> bytes:
     padChar = blockSize - len(plaintext) % blockSize
 

@@ -13,6 +13,7 @@ def WebEncrypt(userData: bytes) -> bytes:
     global gIV
     global gEncryptionKey
 
+    # This is two blocks
     prepend = b"comment1=cooking%20MCs;userdata="
     append = b";comment2=%20like%20a%20pound%20of%20bacon"
 
@@ -53,6 +54,8 @@ def CBCBitFlip():
               for i in range(0, len(ciphertext), gBlockSize)]
     prevBlock = list(blocks[1])
 
+    # The previous block will be used as the IV for our targeted block
+    # This operation is essentially '_' ^ '_' ^ ';'
     prevBlock[offset1] = prevBlock[offset1] ^ ord("_") ^ ord(";")
     prevBlock[offset2] = prevBlock[offset2] ^ ord("_") ^ ord("=")
     prevBlock[offset3] = prevBlock[offset3] ^ ord("_") ^ ord(";")

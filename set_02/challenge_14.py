@@ -32,6 +32,11 @@ def CreatePoisonBlock(numBlocks: int, blockSize: int):
     return (b"1" + b"P" * (blockSize - 2) + b"2") * numBlocks
 
 
+# Create some series of blocks and feed them to the Oracle. 
+# Since ECB encrypts each block separately, at some point
+# we'll get lucky with Oracle's prefix being a multiple of the 
+# blocksize and we'll see a succession of our poison blocks 
+# encrypted. 
 def FindPoisonedBlock(blockSize: int) -> bytes:
     poison = CreatePoisonBlock(3, blockSize)
 
@@ -46,6 +51,9 @@ def FindPoisonedBlock(blockSize: int) -> bytes:
                 return block
 
 
+# This is very similar to challenge 12, but now we need to keep making
+# requests to the Oracle until we see our poisoned blocks. 
+# Once the poisoned block is found we can test another byte for each block.
 def FindByte(inputBytes: bytes, blockSize: int, encryptedPoison: bytes) -> int:
     prefixLength = (blockSize - len(inputBytes) - 1) % blockSize
     poison = CreatePoisonBlock(3, blockSize)
@@ -87,14 +95,18 @@ def BreakCiphertext(blockSize: int) -> bytes:
 
 
 def GetBlockLength() -> int:
+    # Try to get the absolute minimum block size with no
+    # input text
     length = min([len(Oracle(b"")) for i in range(50)])
     previousLength = length
     string = b""
 
+    # Try to get the next smallest length when adding text. 
     while length == previousLength:
         string += b"A"
         length = min([len(Oracle(string)) for i in range(50)])
 
+    # This is most likely the block size
     return abs(length - previousLength)
 
 

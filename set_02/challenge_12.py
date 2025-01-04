@@ -41,9 +41,30 @@ def GetBlockLength() -> int:
 def FindByte(inputBytes: bytes, blockSize: int) -> int:
     prefixLength = (blockSize - len(inputBytes) - 1) % blockSize
     prefix = b"A" * prefixLength
+
+    # Get the output with just our prefix
+    # Say our prefix is 1234567
+    # Say our plaintext is ABCDEFG_ABCDEFG_ABCDEFG_ (3 8 byte blocks)
+    # Our full plaintext is now: (| to split blocks for visibility)
+    #   1234567A|BCDEFG_A|BCDEFG_A|BCDEFG_
+    # Shifting the first byte of the plaintext into our prefix
+    # We can shorten the prefix to move more bytes into our block like so
+    #   123456AB|CDEFG_AB|CDEFG_AB|CDEFG_
+    #   12345ABC|DEFG_ABC|DEFG_ABC|DEFG_
+    #   etc
+    # This is our needle with our currently unknown byte.
+    # In the first case, we know that our prefix, 1234567 + some byte
+    # is now the first block that the Oracle returns. 
+    # In later cases we can move the prefix but instead use the later 
+    # blocks, such, with BCDEFG_ being our known prefix, plus some
+    # unknown byte.
     target = Oracle(prefix)
     target = target[:prefixLength + len(inputBytes) + 1]
 
+    # We have our needle, add a byte to the end of the prefix until
+    # we find a matching block.
+    # We add our known inputBytes here so we get the correct
+    # encrypted block
     for b in range(256):
         comparison = Oracle(prefix + inputBytes + bytes([b]))
         comparison = comparison[:prefixLength + len(inputBytes) + 1]
@@ -55,6 +76,8 @@ def FindByte(inputBytes: bytes, blockSize: int) -> int:
 
 
 def BreakCiphertext(blockSize: int) -> bytes:
+    # Get the ciphertext without our meddling, get it's length so
+    # we know how many bytes we need to break. 
     ciphertext = Oracle(b"")
     discoveredPadding = b""
 

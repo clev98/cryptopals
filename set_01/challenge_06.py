@@ -17,6 +17,11 @@ def HammingDistance(string1: bytes, string2: bytes) -> int:
     return distance
 
 
+# Use Hamming distance between combinations of blocks to get the
+# average distance between blocks. The smallest normalized distance
+# between blocks should indicate that guessed key size was the one used.
+# Two bytes subjected to a single byte XOR will keep the same distance
+# from one another.
 def GetKeySizes(
         ciphertext: bytes,
         min: int = 2,
