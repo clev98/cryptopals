@@ -1,0 +1,8 @@
+[package]
+name = "challenge_30"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+generic-array = "1.2.0"
+md4 = "0.10.2"

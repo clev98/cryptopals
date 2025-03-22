@@ -206,7 +206,7 @@ def MT19937() -> int:
     return z
 
 
-# tODO: This should be done with ECB, but I was lazy.
+# TODO: This should be done with ECB, but I was lazy.
 def AES_CTR_Encrypt(
         plaintext: bytes, key: bytes, nonce: bytes = None) -> tuple:
     if None is nonce:
